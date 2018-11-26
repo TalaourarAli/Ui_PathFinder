@@ -20,7 +20,7 @@ class MainWindow : public QMainWindow
     vector<point> p;
     size_t n=70,m=70;
     size_t indice;
-    vector<point> v;
+    vector<point> v,clist;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
