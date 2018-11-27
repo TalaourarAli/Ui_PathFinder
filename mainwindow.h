@@ -18,10 +18,10 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
     vector<point> p;
-    size_t n=70,m=70;
+    size_t si=70;
     size_t indice;
     vector<point> v,clist;
-
+    double pers=0.3;
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();

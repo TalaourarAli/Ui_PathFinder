@@ -6,30 +6,35 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     QGridLayout *grid=ui->grid;
-    grid->setSpacing(50);
+    //grid->setSpacing(50);
     grid->setGeometry(this->geometry());
     QPalette pal;
     pal.setColor(QPalette::Window, QColor(Qt::black));
-    this->setFixedSize(610,610);
+    this->setFixedSize(600,640);
     creatMap();
-    vector<Clickable *> V(n*m);
-    for(size_t i=0;i<n;i++)
-        for(size_t j=0;j<m;j++){
+    vector<Clickable *> V(si*si);
+    for(size_t i=0;i<si;i++)
+        for(size_t j=0;j<si;j++){
             QString s=QString::fromStdString(to_string(i));
-            V[n*i+j]=new Clickable();
-            V[n*i+j]->setFixedSize(600/n,600/m);
-            V[n*i+j]->setAutoFillBackground(true); // IMPORTANT!
-            QPalette pal = V[n*i+j]->palette();
+            V[si*i+j]=new Clickable();
+            int d=599/si;
+            V[si*i+j]->setFixedSize(d,d);
+            V[si*i+j]->setSizeIncrement(d,d);
+            V[si*i+j]->setAutoFillBackground(true); // IMPORTANT!
+            QPalette pal = V[si*i+j]->palette();
             pal.setColor(QPalette::Window, QColor(Qt::white));
-            V[n*i+j]->setPalette(pal);
-            grid->addWidget(V[m*i+j],int(i),int(j));
+            V[si*i+j]->setPalette(pal);
+            grid->addWidget(V[si*i+j],int(i),int(j));
+            grid->setMargin(10);
         }
     updater(V);
 }
 void MainWindow::updater(vector<Clickable *> V){
-    point start,end;start.x=1;start.y=1;end.x=59;end.y=59;
-    PFinder pf(v,start,end);
-    p=pf.findPath();
+    point start,end;start.x=0;start.y=0;end.x=si-1;end.y=si-1;
+    start.obs=false;
+    end.obs=false;
+    PFinder pf(v,start,end,si);
+    p=pf.findPath("A*");
     clist=pf.getClosedList();
     cout<<"NB="<<pf.getnb()<<endl;
     for(point P:p){
@@ -37,59 +42,54 @@ void MainWindow::updater(vector<Clickable *> V){
         {
             QPalette palb;
             palb.setColor(QPalette::Window, QColor(Qt::black));
-            V[m*P.x+P.y]->setPalette(palb);
+            V[si*P.x+P.y]->setPalette(palb);
         }
         if(P.obs){
             QPalette paly;
             paly.setColor(QPalette::Window, QColor(Qt::gray));
-            V[m*P.x+P.y]->setPalette(paly);
+            V[si*P.x+P.y]->setPalette(paly);
         }
 
 
-    }/*
+    }
     for(auto elt:clist){
         QPalette palb;
         palb.setColor(QPalette::Window, QColor(Qt::red));
-        V[m*elt.x+elt.y]->setPalette(palb);
+        V[si*elt.x+elt.y]->setPalette(palb);
 
-    }*/
+    }
     QPalette palb,palg;
     palb.setColor(QPalette::Window, QColor(Qt::blue));
-    V[m*start.y+start.x]->setPalette(palb);
-    palg.setColor(QPalette::Window, QColor(Qt::red));
-    V[m*end.y+end.x]->setPalette(palg);
+    V[si*start.x+start.y]->setPalette(palb);
+    V[si*end.x+end.y]->setPalette(palb);
+    ui->label->setText("Path length :"+ QString::fromStdString(to_string(clist.size())));
+    ui->label_2->setText("Used method :"+pf.getUsed());
 }
 
 vector<point> MainWindow::creatMap(){
-
-    for(size_t i=0;i<70;i++)
-        for(size_t j=0;j<70;j++)
+    for(size_t i=0;i<si;i++)
+        for(size_t j=0;j<si;j++)
         {
             point p;
             p.x=i;
             p.y=j;
+
+            if(((double) rand()/(RAND_MAX))<pers)p.obs=true;
             v.push_back(p);
         }
-    for(size_t i=12;i<15;i++) //.cout=100;
+    /*for(size_t i=12;i<15;i++) //.cout=100;
                                //.obs=true;
-        for(size_t j=13;j<25;j++)
+        for(size_t j=13;j<25;j++)v[si*i+j].obs=true;//v[si*i+j].obs=true;
 
-            v[m*i+j].obs=true;
+    for(size_t i=45;i<47;i++)
+        for(size_t j=25;j<47;j++)v[si*i+j].obs=true;//v[si*i+j].obs=true;
 
-    for(size_t i=25;i<27;i++)
-        for(size_t j=25;j<35;j++)v[m*j+i].obs=true;
     for(size_t i=15;i<26;i++)
-        for(size_t j=30;j<37;j++)v[m*i+j].obs=true;
+        for(size_t j=30;j<37;j++)v[si*i+j].obs=true;
 
     for(size_t i=20;i<23;i++)
-        for(size_t j=20;j<37;j++)v[m*j+i].obs=true;
-
-    for(size_t i=5;i<12;i++)
-        for(size_t j=16;j<26;j++)v[m*j+i].obs=true;
-
-    for(size_t i=40;i<45;i++)
-        for(size_t j=50;j<55;j++)v[m*i+j].obs=true;
-
+        for(size_t j=20;j<37;j++)v[si*j+i].obs=true;
+*/
     return v;
 }
 
